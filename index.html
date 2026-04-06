@@ -30,7 +30,8 @@
     display:flex; align-items:center; justify-content:space-between;
     padding:0 48px; height:66px;
   }
-  .nav-logo { font-family:'Bebas Neue',sans-serif; font-size:32px; color:var(--yellow); letter-spacing:0.05em; }
+  .nav-logo { display:flex; align-items:center; }
+  .nav-logo img { height:42px; width:auto; display:block; }
   .nav-links { display:flex; gap:28px; list-style:none; }
   .nav-links a { color:var(--white); text-decoration:none; font-family:'Montserrat',sans-serif; font-weight:800; font-size:12px; letter-spacing:0.15em; text-transform:uppercase; transition:color 0.2s; }
   .nav-links a:hover { color:var(--yellow); }
@@ -231,7 +232,7 @@
 
 <!-- NAV -->
 <nav>
-  <div class="nav-logo">Dilli Bites</div>
+  <div class="nav-logo"><img src="images/logo.png" alt="Dilli Bites logo"></div>
   <ul class="nav-links">
     <li><a href="#momos">Momos</a></li>
     <li><a href="#snacks">Snacks</a></li>
