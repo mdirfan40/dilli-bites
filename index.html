@@ -46,6 +46,7 @@
     display:flex; flex-direction:column; align-items:center; justify-content:center;
     text-align:center; padding-left:24px; padding-right:24px;
   }
+  .hero-shell { width:min(100%, 1080px); display:flex; flex-direction:column; align-items:center; }
   .hero-badge {
     display:inline-flex; align-items:center; gap:8px;
     background:var(--yellow); color:var(--black);
@@ -54,13 +55,6 @@
     padding:8px 22px; border-radius:2px; margin-bottom:24px;
     animation: fd 0.7s ease both;
   }
-  .hero h1 {
-    font-family:'Bebas Neue',sans-serif;
-    font-size:clamp(72px,15vw,164px);
-    line-height:0.88; color:var(--white); letter-spacing:0.02em;
-    animation: fd 0.7s 0.1s ease both;
-  }
-  .hero h1 em { color:var(--yellow); font-style:normal; display:block; }
   .hero-sub {
     font-family:'Montserrat',sans-serif; font-weight:900;
     font-size:clamp(12px,2vw,16px); letter-spacing:0.35em; text-transform:uppercase;
@@ -208,6 +202,74 @@
   .cc p { font-family:'Inter',sans-serif; font-weight:600; font-size:16px; color:var(--white); line-height:1.55; }
   .cc a { font-family:'Bebas Neue',sans-serif; font-size:34px; color:var(--yellow); text-decoration:none; letter-spacing:0.06em; }
 
+  .payment-panel {
+    margin-top:26px; padding:30px; border:2px solid rgba(255,214,0,0.22); border-radius:16px;
+    background:linear-gradient(135deg, rgba(255,214,0,0.14) 0%, rgba(20,20,20,0.96) 55%, rgba(10,10,10,1) 100%);
+    box-shadow:0 24px 60px rgba(0,0,0,0.32);
+  }
+  .payment-kicker {
+    display:inline-flex; align-items:center; gap:10px; margin-bottom:12px;
+    font-family:'Montserrat',sans-serif; font-weight:900; font-size:11px;
+    letter-spacing:0.26em; text-transform:uppercase; color:var(--yellow);
+  }
+  .payment-title {
+    font-family:'Bebas Neue',sans-serif; font-size:clamp(34px,5vw,56px);
+    letter-spacing:0.04em; color:var(--white); line-height:0.95;
+  }
+  .payment-copy {
+    margin-top:12px; max-width:760px;
+    font-family:'Inter',sans-serif; font-size:15px; line-height:1.7; color:#E6E6E6;
+  }
+  .payment-copy strong { color:var(--yellow); }
+  .payment-actions {
+    display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:16px; margin-top:24px;
+  }
+  .payment-app {
+    display:flex; align-items:center; gap:16px; padding:18px 20px;
+    border:2px solid rgba(255,255,255,0.08); border-radius:14px; background:rgba(255,255,255,0.03);
+    text-decoration:none; transition:transform 0.25s, border-color 0.25s, background 0.25s, box-shadow 0.25s;
+  }
+  .payment-app:hover {
+    transform:translateY(-4px); border-color:var(--yellow); background:rgba(255,214,0,0.08);
+    box-shadow:0 16px 34px rgba(0,0,0,0.32);
+  }
+  .payment-badge {
+    width:52px; height:52px; border-radius:14px; flex-shrink:0;
+    display:grid; place-items:center; background:var(--yellow); color:var(--black);
+    font-family:'Montserrat',sans-serif; font-weight:900; font-size:18px; letter-spacing:0.08em;
+  }
+  .payment-app-body { display:flex; flex-direction:column; gap:4px; min-width:0; }
+  .payment-app-name {
+    font-family:'Montserrat',sans-serif; font-weight:900; font-size:14px;
+    color:var(--white); letter-spacing:0.14em; text-transform:uppercase;
+  }
+  .payment-app-meta {
+    font-family:'Inter',sans-serif; font-size:13px; color:var(--gray); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  }
+  .payment-note {
+    margin-top:18px;
+    font-family:'Montserrat',sans-serif; font-weight:700; font-size:11px;
+    letter-spacing:0.08em; text-transform:uppercase; color:var(--gray);
+  }
+  .hero .payment-panel {
+    width:min(100%, 940px); margin-top:0; text-align:center; animation: fd 0.7s 0.24s ease both;
+  }
+  .hero .payment-actions { justify-items:center; }
+  .hero .payment-title { font-size:clamp(38px,6vw,64px); }
+  .hero .payment-copy { max-width:none; }
+
+  @media(max-width:700px){
+    .payment-panel { padding:24px 18px; }
+    .payment-actions { grid-template-columns:1fr; }
+    .payment-app { padding:16px; }
+    .payment-badge { width:48px; height:48px; border-radius:12px; }
+    .payment-app-name { font-size:13px; }
+    .payment-app-meta { font-size:12px; }
+    .hero .payment-panel { text-align:center; }
+    .payment-app { justify-content:center; text-align:center; }
+    .payment-app-body { align-items:center; }
+  }
+
   /* FOOTER */
   footer {
     background:var(--black); border-top:3px solid var(--yellow);
@@ -244,13 +306,33 @@
 
 <!-- HERO -->
 <section class="hero">
-  <div class="hero-badge">🌶️ &nbsp; Street Food · Fast Food · Momos</div>
-  <h1>DILLI<em>BITES</em></h1>
-  <p class="hero-sub">Taste of Delhi</p>
-  <div class="hero-line"></div>
-  <div class="hero-cta">
-    <a href="#momos" class="btn-y">Explore Menu</a>
-    <a href="#contact" class="btn-o">Find Us</a>
+  <div class="hero-shell">
+    <div class="hero-badge">🌶️ &nbsp; Street Food · Fast Food · Momos</div>
+    <p class="hero-sub">Taste of Delhi</p>
+    <div class="hero-line"></div>
+    <div id="payment" class="payment-panel rv in">
+      <h3 class="payment-title">Pay Using</h3>
+      <div class="payment-actions">
+        <a class="payment-app" data-payment-app="phonepe" href="phonepe://pay?pa=9971648606@ptsbi&pn=Dilli%20Bites&tn=Order%20Payment" aria-label="Pay with PhonePe">
+          <span class="payment-badge">PP</span>
+          <span class="payment-app-body">
+            <span class="payment-app-name">PhonePe</span>
+          </span>
+        </a>
+        <a class="payment-app" data-payment-app="paytm" href="paytmmp://pay?pa=9971648606@ptsbi&pn=Dilli%20Bites&tn=Order%20Payment" aria-label="Pay with Paytm">
+          <span class="payment-badge">PT</span>
+          <span class="payment-app-body">
+            <span class="payment-app-name">Paytm</span>
+          </span>
+        </a>
+        <a class="payment-app" data-payment-app="googlepay" href="tez://upi/pay?pa=9971648606@ptsbi&pn=Dilli%20Bites&tn=Order%20Payment" aria-label="Pay with Google Pay">
+          <span class="payment-badge">GP</span>
+          <span class="payment-app-body">
+            <span class="payment-app-name">Google Pay</span>
+          </span>
+        </a>
+      </div>
+    </div>
   </div>
 </section>
 
