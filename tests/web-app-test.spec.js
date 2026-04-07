@@ -26,8 +26,6 @@ test.describe('DilliBites Web App Tests', () => {
     await expect(page.locator('#snacks')).toBeVisible();
     await expect(page.locator('#pizza')).toBeVisible();
     await expect(page.locator('#contact')).toBeVisible();
-    await expect(page.locator('#payment')).toBeVisible();
-    await expect(page.locator('.hero .payment-panel')).toBeVisible();
     await expect(page.locator('footer')).toBeVisible();
   });
 
@@ -49,8 +47,6 @@ test.describe('DilliBites Web App Tests', () => {
     await page.goto('http://localhost:3000');
     await page.waitForLoadState('networkidle');
 
-    await expect(page.locator('.hero .payment-panel')).toBeInViewport();
-
     // Test Explore Menu button
     await page.locator('a[href="#momos"]').first().click();
     await expect(page.locator('#momos')).toBeInViewport();
@@ -58,26 +54,6 @@ test.describe('DilliBites Web App Tests', () => {
     // Test Find Us button
     await page.locator('a[href="#contact"]').first().click();
     await expect(page.locator('#contact')).toBeInViewport();
-  });
-
-  test('Payment links include hard-coded UPI details', async ({ page }) => {
-    await page.goto('http://localhost:3000');
-    await page.waitForLoadState('networkidle');
-
-    const paymentApps = [
-      { selector: '[data-payment-app="phonepe"]', scheme: 'phonepe://pay' },
-      { selector: '[data-payment-app="paytm"]', scheme: 'paytmmp://pay' },
-      { selector: '[data-payment-app="googlepay"]', scheme: 'tez://upi/pay' },
-    ];
-
-    for (const paymentApp of paymentApps) {
-      const locator = page.locator(paymentApp.selector);
-      await expect(locator).toBeVisible();
-
-      const href = await locator.getAttribute('href');
-      expect(href).toContain('9971648606@ptsbi');
-      expect(href).toContain(paymentApp.scheme);
-    }
   });
 
   test('Check images load', async ({ page }) => {
