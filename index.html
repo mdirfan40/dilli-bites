@@ -226,6 +226,7 @@
   }
   .payment-app {
     display:flex; align-items:center; gap:16px; padding:18px 20px;
+    width:100%;
     border:2px solid rgba(255,255,255,0.08); border-radius:14px; background:rgba(255,255,255,0.03);
     text-decoration:none; transition:transform 0.25s, border-color 0.25s, background 0.25s, box-shadow 0.25s;
   }
@@ -235,8 +236,7 @@
   }
   .payment-badge {
     width:52px; height:52px; border-radius:14px; flex-shrink:0;
-    display:grid; place-items:center; background:var(--yellow); color:var(--black);
-    font-family:'Montserrat',sans-serif; font-weight:900; font-size:18px; letter-spacing:0.08em;
+    object-fit:contain; display:block; background:#FFFFFF; padding:6px;
   }
   .payment-app-body { display:flex; flex-direction:column; gap:4px; min-width:0; }
   .payment-app-name {
@@ -308,25 +308,24 @@
 <section class="hero">
   <div class="hero-shell">
     <div class="hero-badge">🌶️ &nbsp; Street Food · Fast Food · Momos</div>
-    <p class="hero-sub">Taste of Delhi</p>
     <div class="hero-line"></div>
     <div id="payment" class="payment-panel rv in">
       <h3 class="payment-title">Pay Using</h3>
       <div class="payment-actions">
-        <a class="payment-app" data-payment-app="phonepe" href="phonepe://pay?pa=9971648606@ptsbi&pn=Dilli%20Bites&tn=Order%20Payment" aria-label="Pay with PhonePe">
-          <span class="payment-badge">PP</span>
-          <span class="payment-app-body">
-            <span class="payment-app-name">PhonePe</span>
-          </span>
-        </a>
-        <a class="payment-app" data-payment-app="paytm" href="paytmmp://pay?pa=9971648606@ptsbi&pn=Dilli%20Bites&tn=Order%20Payment" aria-label="Pay with Paytm">
-          <span class="payment-badge">PT</span>
+        <a class="payment-app" data-payment-app="paytm" href="paytmmp://pay?pa=paytmqr6n2lhw@ptys&pn=Dilli%20Bites&tn=Order%20Payment" aria-label="Pay with Paytm">
+          <img class="payment-badge" src="images/paytm-icon.webp" alt="Paytm" width="52" height="52" decoding="async">
           <span class="payment-app-body">
             <span class="payment-app-name">Paytm</span>
           </span>
         </a>
-        <a class="payment-app" data-payment-app="googlepay" href="tez://upi/pay?pa=9971648606@ptsbi&pn=Dilli%20Bites&tn=Order%20Payment" aria-label="Pay with Google Pay">
-          <span class="payment-badge">GP</span>
+        <a class="payment-app" data-payment-app="phonepe" href="phonepe://pay?pa=paytmqr6n2lhw@ptys&pn=Dilli%20Bites&tn=Order%20Payment" aria-label="Pay with PhonePe">
+          <img class="payment-badge" src="images/phonepe-icon.webp" alt="PhonePe" width="52" height="52" decoding="async">
+          <span class="payment-app-body">
+            <span class="payment-app-name">PhonePe</span>
+          </span>
+        </a>
+        <a class="payment-app" data-payment-app="googlepay" href="tez://upi/pay?pa=paytmqr6n2lhw@ptys&pn=Dilli%20Bites&tn=Order%20Payment" aria-label="Pay with Google Pay">
+          <img class="payment-badge" src="images/google-pay-icon.webp" alt="Google Pay" width="52" height="52" decoding="async">
           <span class="payment-app-body">
             <span class="payment-app-name">Google Pay</span>
           </span>
