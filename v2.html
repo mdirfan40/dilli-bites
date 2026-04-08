@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Dilli Bites V2 - Mobile Menu</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-0: #090909;
+      --bg-1: #111217;
+      --bg-2: #1a1c22;
+      --card: #1b1d23;
+      --card-soft: #232733;
+      --stroke: #2f3441;
+      --text: #f0f2f5;
+      --muted: #b7bdc8;
+      --brand: #f6c445;
+      --brand-soft: #ffe08a;
+      --accent: #ff7a18;
+      --ok: #f6c445;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      min-height: 100%;
+      background: radial-gradient(110% 80% at 14% 0%, #232026 0%, transparent 46%),
+                  radial-gradient(120% 86% at 100% 12%, #1f2431 0%, transparent 42%),
+                  linear-gradient(180deg, var(--bg-1) 0%, var(--bg-0) 100%);
+      color: var(--text);
+      font-family: "Sora", sans-serif;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+    }
+
+    .v2-shell {
+      width: 100%;
+      max-width: 470px;
+      margin: 0 auto;
+      min-height: 100dvh;
+      position: relative;
+      isolation: isolate;
+      padding-bottom: calc(90px + env(safe-area-inset-bottom));
+    }
+
+    .glow {
+      position: fixed;
+      width: 220px;
+      aspect-ratio: 1;
+      border-radius: 50%;
+      filter: blur(50px);
+      z-index: -1;
+      opacity: 0.42;
+      pointer-events: none;
+      animation: drift 10s ease-in-out infinite alternate;
+    }
+
+    .glow-one {
+      top: -80px;
+      left: -80px;
+      background: #ff9d3d;
+    }
+
+    .glow-two {
+      top: 22%;
+      right: -110px;
+      background: #6f7cff;
+      animation-delay: 1.8s;
+    }
+
+    @keyframes drift {
+      from { transform: translateY(-10px) scale(0.92); }
+      to { transform: translateY(14px) scale(1.06); }
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      padding: calc(10px + env(safe-area-inset-top)) 14px 12px;
+      border-bottom: 1px solid rgba(246, 196, 69, 0.22);
+      backdrop-filter: blur(14px);
+      background: linear-gradient(180deg, rgba(12, 13, 17, 0.96) 0%, rgba(12, 13, 17, 0.78) 100%);
+    }
+
+    .topbar-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .brand-logo {
+      width: 130px;
+      height: auto;
+      display: block;
+    }
+
+    .location {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: #d0d4dc;
+      font-size: 0.86rem;
+      font-weight: 600;
+      white-space: nowrap;
+      padding: 8px 10px;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .pin {
+      color: var(--brand);
+      font-size: 1rem;
+    }
+
+    .content {
+      padding: 14px;
+      animation: page-reveal 420ms ease-out both;
+    }
+
+    @keyframes page-reveal {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .cat-row {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      margin: 6px 0 20px;
+    }
+
+    .cat-item {
+      border: 1px solid var(--stroke);
+      background: linear-gradient(180deg, rgba(43, 47, 58, 0.5), rgba(23, 25, 31, 0.92));
+      border-radius: 16px;
+      text-align: center;
+      padding: 10px 8px;
+      transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+    }
+
+    .cat-item img {
+      width: 44px;
+      height: 44px;
+      object-fit: contain;
+      display: block;
+      margin: 0 auto 6px;
+    }
+
+    .cat-item.active {
+      border-color: rgba(246, 196, 69, 0.82);
+      box-shadow: 0 0 0 1px rgba(246, 196, 69, 0.35) inset;
+      transform: translateY(-1px);
+    }
+
+    h2 {
+      margin: 2px 2px 14px;
+      font-family: "Plus Jakarta Sans", sans-serif;
+      font-size: 1.7rem;
+      letter-spacing: -0.02em;
+    }
+
+    .section-meta {
+      margin: -8px 2px 14px;
+      color: var(--muted);
+      font-size: 0.9rem;
+      letter-spacing: 0.01em;
+    }
+
+    .list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .item {
+      position: relative;
+      display: grid;
+      grid-template-columns: 96px 1fr auto;
+      gap: 12px;
+      align-items: center;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 18px;
+      background: linear-gradient(90deg, rgba(31, 33, 41, 1) 0%, rgba(28, 30, 38, 0.98) 100%);
+      padding: 10px;
+      overflow: hidden;
+    }
+
+    .item::after {
+      content: "";
+      position: absolute;
+      inset: auto -20% -48% auto;
+      width: 180px;
+      height: 160px;
+      background: radial-gradient(circle, rgba(246, 196, 69, 0.09) 0%, transparent 62%);
+      pointer-events: none;
+    }
+
+    .item img {
+      width: 96px;
+      height: 96px;
+      border-radius: 12px;
+      object-fit: cover;
+      display: block;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    .item-copy {
+      min-width: 0;
+      display: grid;
+      gap: 4px;
+    }
+
+    .item-copy h3 {
+      margin: 0;
+      font-family: "Plus Jakarta Sans", sans-serif;
+      font-size: 1.12rem;
+      letter-spacing: -0.01em;
+      line-height: 1.2;
+    }
+
+    .item-copy p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.93rem;
+      line-height: 1.35;
+    }
+
+    .price {
+      color: var(--brand-soft);
+      font-weight: 700;
+      font-size: 0.84rem;
+      letter-spacing: 0.02em;
+    }
+
+    .add-btn {
+      align-self: end;
+      border: none;
+      border-radius: 14px;
+      background: var(--ok);
+      color: #14120b;
+      font-family: "Plus Jakarta Sans", sans-serif;
+      font-size: 1.02rem;
+      font-weight: 800;
+      padding: 10px 14px;
+      min-width: 86px;
+      cursor: pointer;
+      transition: transform 160ms ease, filter 160ms ease;
+    }
+
+    .add-btn:active {
+      transform: scale(0.97);
+    }
+
+    .add-btn:hover {
+      filter: brightness(1.05);
+    }
+
+    .badge {
+      position: absolute;
+      top: 8px;
+      left: 8px;
+      background: linear-gradient(90deg, #ffbf35, #ffdc74);
+      color: #272010;
+      border-radius: 999px;
+      font-size: 0.7rem;
+      font-weight: 800;
+      padding: 4px 8px;
+      letter-spacing: 0.03em;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      z-index: 2;
+    }
+
+    .cart-dock {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 30;
+      padding: 10px 14px calc(10px + env(safe-area-inset-bottom));
+      background: linear-gradient(180deg, rgba(15, 15, 19, 0) 0%, rgba(13, 13, 16, 0.9) 32%, rgba(13, 13, 16, 0.98) 100%);
+    }
+
+    .cart-bar {
+      width: min(470px, 100%);
+      margin: 0 auto;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 999px;
+      background: linear-gradient(90deg, #f6c445 0%, #efb726 100%);
+      color: #14120b;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 8px;
+      box-shadow: 0 14px 30px rgba(0, 0, 0, 0.45);
+    }
+
+    .cart-info {
+      margin-left: 10px;
+      font-family: "Plus Jakarta Sans", sans-serif;
+      font-size: 1.04rem;
+      font-weight: 800;
+      letter-spacing: 0.01em;
+    }
+
+    .view-cart {
+      border: none;
+      border-radius: 999px;
+      background: rgba(13, 13, 16, 0.9);
+      color: #f8deb2;
+      font-size: 0.98rem;
+      font-weight: 700;
+      padding: 10px 16px;
+      cursor: pointer;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    @media (min-width: 480px) {
+      .topbar {
+        border-left: 1px solid rgba(255, 255, 255, 0.08);
+        border-right: 1px solid rgba(255, 255, 255, 0.08);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="glow glow-one"></div>
+  <div class="glow glow-two"></div>
+
+  <div class="v2-shell">
+    <header class="topbar">
+      <div class="topbar-inner">
+        <div class="brand">
+          <img class="brand-logo" src="/images/logo.webp" alt="Dilli Bites logo" width="130" height="58" decoding="async">
+        </div>
+        <div class="location"><span class="pin">●</span> Jamo Bazar</div>
+      </div>
+    </header>
+
+    <main class="content">
+      <section class="cat-row" id="categoryRow" aria-label="Categories"></section>
+
+      <h2 id="sectionTitle">All Momos</h2>
+      <p class="section-meta" id="sectionMeta">Tap icons to switch menu categories.</p>
+
+      <section class="list" id="momosList" aria-label="Momos list"></section>
+    </main>
+  </div>
+
+  <div class="cart-dock">
+    <div class="cart-bar">
+      <div class="cart-info" id="cartSummary">0 Items | Rs 0</div>
+      <button class="view-cart" type="button" id="viewCartBtn">View Cart</button>
+    </div>
+  </div>
+
+  <script>
+    const categories = [
+      { key: "burger", name: "Burger", title: "All Burgers", icon: "/images/food_icon/burger.webp" },
+      { key: "momos", name: "Momos", title: "All Momos", icon: "/images/food_icon/momos.webp" },
+      { key: "pizza", name: "Pizza", title: "All Pizzas", icon: "/images/food_icon/pizza.webp" },
+      { key: "fries", name: "Fries", title: "All Fries", icon: "/images/food_icon/french_fires.webp" }
+    ];
+
+    const menuByCategory = {
+      burger: [
+        { name: "Plain Burger", description: "Burgers", image: "/images/burger.webp", priceText: "Rs 50", badge: "Burger" },
+        { name: "Cheese Burger", description: "Burgers", image: "/images/burger.webp", priceText: "Rs 60", badge: "Burger" },
+        { name: "Chicken Burger", description: "Burgers", image: "/images/burger.webp", priceText: "Rs 80", badge: "Burger" }
+      ],
+      momos: [
+        { name: "Steam Veg Momos", description: "Steam Momos", image: "/images/steam_momos.webp", priceText: "Rs 30-50", badge: "Steam" },
+        { name: "Steam Paneer Momos", description: "Steam Momos", image: "/images/steam_momos.webp", priceText: "Rs 45-80", badge: "Steam" },
+        { name: "Steam Chicken Momos", description: "Steam Momos", image: "/images/steam_momos.webp", priceText: "Rs 45-80", badge: "Steam" },
+        { name: "Fried Veg Momos", description: "Fried Momos", image: "/images/fried_momos.webp", priceText: "Rs 35-60", badge: "Fried" },
+        { name: "Fried Paneer Momos", description: "Fried Momos", image: "/images/fried_momos.webp", priceText: "Rs 50-90", badge: "Fried" },
+        { name: "Fried Chicken Momos", description: "Fried Momos", image: "/images/fried_momos.webp", priceText: "Rs 50-90", badge: "Fried" },
+        { name: "Gravy Veg Momos", description: "Gravy Momos", image: "/images/gravy_momos.webp", priceText: "Rs 60-100", badge: "Gravy" },
+        { name: "Gravy Paneer Momos", description: "Gravy Momos", image: "/images/gravy_momos.webp", priceText: "Rs 70-120", badge: "Gravy" },
+        { name: "Gravy Chicken Momos", description: "Gravy Momos", image: "/images/gravy_momos.webp", priceText: "Rs 70-120", badge: "Gravy" },
+        { name: "Malai Veg Momos", description: "Malai Momos", image: "/images/malai_momos.webp", priceText: "Rs 60-100", badge: "Malai" },
+        { name: "Malai Paneer Momos", description: "Malai Momos", image: "/images/malai_momos.webp", priceText: "Rs 70-120", badge: "Malai" },
+        { name: "Malai Chicken Momos", description: "Malai Momos", image: "/images/malai_momos.webp", priceText: "Rs 70-120", badge: "Malai" },
+        { name: "Kurkure Veg Momos", description: "Kurkure Momos", image: "/images/kurkure_momos.webp", priceText: "Rs 60-100", badge: "Kurkure" },
+        { name: "Kurkure Paneer Momos", description: "Kurkure Momos", image: "/images/kurkure_momos.webp", priceText: "Rs 70-120", badge: "Kurkure" },
+        { name: "Kurkure Chicken Momos", description: "Kurkure Momos", image: "/images/kurkure_momos.webp", priceText: "Rs 70-120", badge: "Kurkure" }
+      ],
+      fries: [
+        { name: "Salted Fries", description: "French Fries", image: "/images/french_fries.webp", priceText: "Rs 30", badge: "Crispy" },
+        { name: "Peri-Peri Fries", description: "French Fries", image: "/images/french_fries.webp", priceText: "Rs 40", badge: "Crispy" },
+        { name: "Cold Coffee", description: "Drinks", image: "https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=640&q=80", priceText: "Rs 80", badge: "Drinks" }
+      ],
+      pizza: [
+        { name: "Pizza Mania Onion", description: "Veg Single Topping", image: "/images/food_icon/pizza.webp", priceText: "Rs 99", badge: "Single Topping" },
+        { name: "Pizza Mania Capsicum", description: "Veg Single Topping", image: "/images/food_icon/pizza.webp", priceText: "Rs 99", badge: "Single Topping" },
+        { name: "Pizza Mania Tomato", description: "Veg Single Topping", image: "/images/food_icon/pizza.webp", priceText: "Rs 99", badge: "Single Topping" },
+        { name: "Pizza Mania Corn", description: "Veg Single Topping", image: "/images/food_icon/pizza.webp", priceText: "Rs 99", badge: "Single Topping" },
+        { name: "Onion + Paneer", description: "Veg Double Topping", image: "/images/food_icon/pizza.webp", priceText: "Rs 120", badge: "Double Topping" },
+        { name: "Onion + Capsicum", description: "Veg Double Topping", image: "/images/food_icon/pizza.webp", priceText: "Rs 120", badge: "Double Topping" },
+        { name: "Capsicum + Tomato", description: "Veg Double Topping", image: "/images/food_icon/pizza.webp", priceText: "Rs 120", badge: "Double Topping" },
+        { name: "Onion + Corn", description: "Veg Double Topping", image: "/images/food_icon/pizza.webp", priceText: "Rs 120", badge: "Double Topping" },
+        { name: "Margherita", description: "Single Cheese | R 120 | M 169 | L 259 | XL 349", image: "/images/food_icon/pizza.webp", priceText: "R 120-M 169-L 259-XL 349", badge: "Signature" },
+        { name: "Capsicum India", description: "Onion, Capsicum, Tomato, Mushroom | R 149 | M 220 | L 299 | XL 399", image: "/images/food_icon/pizza.webp", priceText: "R 149-M 220-L 299-XL 399", badge: "Signature" },
+        { name: "Paneer Spicy", description: "Capsicum, Paneer, Red Paprika | R 149 | M 220 | L 299 | XL 399", image: "/images/food_icon/pizza.webp", priceText: "R 149-M 220-L 299-XL 399", badge: "Signature" },
+        { name: "Veggie Paradise", description: "Golden Corn, Black Olives, Capsicum and Red Paprika | R 149 | M 220 | L 299 | XL 399", image: "/images/food_icon/pizza.webp", priceText: "R 149-M 220-L 299-XL 399", badge: "Signature" },
+        { name: "Paneer Makhani", description: "Paneer, Capsicum, Makhani Sauce | R 149 | M 220 | L 299 | XL 399", image: "/images/food_icon/pizza.webp", priceText: "R 149-M 220-L 299-XL 399", badge: "Signature" },
+        { name: "Deluxe Veggie", description: "Onion, Capsicum, Grilled Mushroom, Golden Corn and Paneer | R 149 | M 220 | L 299 | XL 399", image: "/images/food_icon/pizza.webp", priceText: "R 149-M 220-L 299-XL 399", badge: "Signature" },
+        { name: "Kadhai Paneer", description: "Paneer Chunks, Flavour Spicy Kadhai | R 149 | M 220 | L 299 | XL 399", image: "/images/food_icon/pizza.webp", priceText: "R 149-M 220-L 299-XL 399", badge: "Signature" },
+        { name: "Loaded Veg.", description: "Tomato, Mushroom and Jalapeno | R 149 | M 220 | L 299 | XL 399", image: "/images/food_icon/pizza.webp", priceText: "R 149-M 220-L 299-XL 399", badge: "Signature" },
+        { name: "Veggie Feast", description: "Harbed Onion, Green Capsicum, Sweet Corn | R 149 | M 220 | L 299 | XL 399", image: "/images/food_icon/pizza.webp", priceText: "R 149-M 220-L 299-XL 399", badge: "Signature" },
+        { name: "Spiced Paneer", description: "Spiced Paneer, Onion and Tomato | R 149 | M 220 | L 299 | XL 399", image: "/images/food_icon/pizza.webp", priceText: "R 149-M 220-L 299-XL 399", badge: "Signature" },
+        { name: "Veggie Lovers", description: "Onion, Herbed Onion, Green Capsicum and Red Paprika | R 149 | M 220 | L 299 | XL 399", image: "/images/food_icon/pizza.webp", priceText: "R 149-M 220-L 299-XL 399", badge: "Signature" },
+        { name: "Double Panner Supreme", description: "Special Paneer, Herbed Onion, Green Capsicum and Red Paprika | R 159 | M 229 | L 310 | XL 399", image: "/images/food_icon/pizza.webp", priceText: "R 159-M 229-L 310-XL 399", badge: "Signature" },
+        { name: "Mexican Green Wave", description: "Onion, Capsicum, Tomato and Jalapeno, Maximum Herbs | R 159 | M 229 | L 310 | XL 420", image: "/images/food_icon/pizza.webp", priceText: "R 159-M 229-L 310-XL 420", badge: "Signature" },
+        { name: "Indi Tandoori Paneer", description: "Paneer Tikka, Capsicum, Red Paprika, Makhani Sauce | R 159 | M 229 | L 310 | XL 420", image: "/images/food_icon/pizza.webp", priceText: "R 159-M 229-L 310-XL 420", badge: "Signature" },
+        { name: "Gormet Pizza", description: "Golden Corn, Jalapeno, Black Olive | R 159 | M 229 | L 310 | XL 420", image: "/images/food_icon/pizza.webp", priceText: "R 159-M 229-L 310-XL 420", badge: "Signature" },
+        { name: "Extravaganza", description: "Onion, Capsicum, Tomato, Golden Corn, Mushroom | R 159 | M 229 | L 310 | XL 420", image: "/images/food_icon/pizza.webp", priceText: "R 159-M 229-L 310-XL 420", badge: "Signature" },
+        { name: "Country Special", description: "Onion, Capsicum, Tomato, Golden Corn, Mushroom, Jalapeno, Black Olive | R 169 | M 239 | L 350 | XL 449", image: "/images/food_icon/pizza.webp", priceText: "R 169-M 239-L 350-XL 449", badge: "Signature" },
+        { name: "Chicago Slice Pasta Special", description: "Capsicum, Paneer, Red Paprika, Corn, Onion | R 169 | M 269 | L 399 | XL 499", image: "/images/food_icon/pizza.webp", priceText: "R 169-M 269-L 399-XL 499", badge: "Signature" },
+        { name: "Stuff Garlic Bread", description: "Crispy garlic bread, stuffed and toasted to perfection", image: "/images/stuff_gralic_bread.webp", priceText: "Rs 149", badge: "Popular" }
+      ]
+    };
+
+    const cart = { count: 0, total: 0 };
+    let activeCategory = "momos";
+    const categoryRow = document.getElementById("categoryRow");
+    const sectionTitle = document.getElementById("sectionTitle");
+    const sectionMeta = document.getElementById("sectionMeta");
+    const momosList = document.getElementById("momosList");
+    const cartSummary = document.getElementById("cartSummary");
+
+    function basePriceFromText(priceText) {
+      const match = priceText.match(/\d+/);
+      return match ? Number(match[0]) : 0;
+    }
+
+    function renderCategories() {
+      categoryRow.innerHTML = categories
+        .map((category) => {
+          const activeClass = category.key === activeCategory ? " active" : "";
+          return `
+            <article class="cat-item${activeClass}" data-key="${category.key}" aria-label="${category.name}" title="${category.name}">
+              <img src="${category.icon}" alt="${category.name} icon" width="44" height="44" decoding="async">
+            </article>
+          `;
+        })
+        .join("");
+    }
+
+    function renderMenu() {
+      const selectedCategory = categories.find((category) => category.key === activeCategory);
+      const currentItems = menuByCategory[activeCategory] || [];
+
+      sectionTitle.textContent = selectedCategory ? selectedCategory.title : "Menu";
+      sectionMeta.textContent = `${currentItems.length} items from original menu.`;
+
+      momosList.innerHTML = currentItems
+        .map((item) => {
+          const badgeHtml = item.badge ? `<span class="badge">${item.badge}</span>` : "";
+          const basePrice = basePriceFromText(item.priceText);
+          return `
+            <article class="item" data-name="${item.name}" data-price="${basePrice}">
+              ${badgeHtml}
+              <img src="${item.image}" alt="${item.name}" width="96" height="96" loading="lazy" decoding="async">
+              <div class="item-copy">
+                <h3>${item.name}</h3>
+                <p>${item.description}</p>
+                <span class="price">${item.priceText}</span>
+              </div>
+              <button class="add-btn" type="button">+ Add</button>
+            </article>
+          `;
+        })
+        .join("");
+    }
+
+    function updateCart() {
+      cartSummary.textContent = `${cart.count} Items | Rs ${cart.total}`;
+    }
+
+    momosList.addEventListener("click", (event) => {
+      const btn = event.target.closest(".add-btn");
+      if (!btn) {
+        return;
+      }
+
+      const card = btn.closest(".item");
+      const price = Number(card.getAttribute("data-price"));
+      cart.count += 1;
+      cart.total += price;
+      updateCart();
+
+      btn.textContent = "Added";
+      btn.style.transform = "scale(0.98)";
+      setTimeout(() => {
+        btn.textContent = "+ Add";
+        btn.style.transform = "";
+      }, 260);
+    });
+
+    categoryRow.addEventListener("click", (event) => {
+      const tile = event.target.closest(".cat-item");
+      if (!tile) {
+        return;
+      }
+
+      const nextKey = tile.getAttribute("data-key");
+      if (!nextKey || nextKey === activeCategory) {
+        return;
+      }
+
+      activeCategory = nextKey;
+      renderCategories();
+      renderMenu();
+    });
+
+    renderCategories();
+    renderMenu();
+
+    document.getElementById("viewCartBtn").addEventListener("click", () => {
+      alert(cart.count === 0 ? "Your cart is empty." : `You added ${cart.count} item(s), total Rs ${cart.total}.`);
+    });
+  </script>
+</body>
+</html>
