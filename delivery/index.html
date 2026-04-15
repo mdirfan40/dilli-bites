@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dilli Bites — Delivery Portal</title>
+<style>
+  :root { --yellow:#FFD600; --black:#111; --red:#E63946; --green:#16a34a; --border:#e0e0e0; --muted:#666; --gray:#f5f5f5; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', sans-serif; background: #f8f8f8; color: var(--black); }
+
+  .auth-screen { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: var(--black); }
+  .auth-box { background: #fff; border-radius: 16px; padding: 36px; width: 320px; text-align: center; }
+  .logo-tag { display: inline-block; background: var(--yellow); color: var(--black); font-weight: 900; font-size: 1.3rem; padding: 4px 14px; border-radius: 4px; margin-bottom: 14px; }
+  .auth-box h1 { font-size: 1.4rem; margin-bottom: 4px; }
+  .auth-box p { color: var(--muted); font-size: 0.88rem; margin-bottom: 22px; }
+  .auth-box input { width: 100%; padding: 11px; border: 1px solid var(--border); border-radius: 8px; font-size: 0.95rem; margin-bottom: 10px; }
+  .auth-box input:focus { outline: 2px solid var(--yellow); border-color: transparent; }
+  .btn-primary { width: 100%; padding: 12px; background: var(--yellow); color: var(--black); border: none; border-radius: 8px; font-size: 1rem; font-weight: 700; cursor: pointer; }
+  .auth-error { color: var(--red); font-size: 0.83rem; margin-top: 8px; }
+
+  .app { display: none; min-height: 100vh; flex-direction: column; }
+  .app.visible { display: flex; }
+  header { background: var(--black); color: #fff; padding: 0 20px; height: 54px; display: flex; align-items: center; gap: 12px; }
+  header .brand { font-weight: 900; color: var(--yellow); font-size: 1rem; }
+  header .greeting { color: #ccc; font-size: 0.85rem; flex: 1; }
+  header button { background: transparent; border: 1px solid #444; color: #ccc; padding: 5px 12px; border-radius: 6px; cursor: pointer; font-size: 0.83rem; }
+  header button:hover { border-color: var(--yellow); color: var(--yellow); }
+
+  .main { padding: 20px; max-width: 600px; margin: 0 auto; width: 100%; }
+  .page-title { font-size: 1.1rem; font-weight: 800; margin-bottom: 16px; }
+  .order-card { background: #fff; border: 1px solid var(--border); border-radius: 12px; padding: 18px; margin-bottom: 14px; }
+  .order-head { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
+  .order-id { font-weight: 900; font-size: 1rem; }
+  .badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; }
+  .badge-assigned { background: #ffedd5; color: #9a3412; }
+  .badge-out_for_delivery { background: #fed7aa; color: #7c2d12; }
+  .badge-delivered { background: #dcfce7; color: #166534; }
+  .order-items { font-size: 0.86rem; margin-bottom: 8px; }
+  .order-items span { display: inline-block; background: var(--gray); padding: 2px 7px; border-radius: 4px; margin: 2px; }
+  .order-meta { font-size: 0.84rem; color: var(--muted); margin-bottom: 14px; }
+  .order-meta strong { color: var(--black); }
+  .order-total { font-weight: 900; color: var(--red); }
+  .actions { display: flex; gap: 8px; margin-top: 12px; }
+  .btn-pickup { padding: 9px 18px; background: #f97316; color: #fff; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 0.88rem; }
+  .btn-deliver { padding: 9px 18px; background: var(--green); color: #fff; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 0.88rem; }
+  .btn-pickup:hover { background: #ea6c00; }
+  .btn-deliver:hover { background: #15803d; }
+  .empty-state { text-align: center; padding: 60px 20px; color: var(--muted); }
+  .toast { position: fixed; bottom: 24px; right: 24px; background: var(--black); color: #fff; padding: 12px 20px; border-radius: 8px; font-size: 0.88rem; font-weight: 600; z-index: 999; opacity: 0; transition: opacity 0.3s; pointer-events: none; }
+  .toast.show { opacity: 1; }
+  .toast.success { border-left: 4px solid var(--green); }
+  .toast.error { border-left: 4px solid var(--red); }
+</style>
+</head>
+<body>
+
+<div class="auth-screen" id="authScreen">
+  <div class="auth-box">
+    <div class="logo-tag">🛵 Dilli Bites</div>
+    <h1>Delivery Login</h1>
+    <p>Sign in with your phone and password</p>
+    <input type="tel" id="phoneInput" placeholder="10-digit phone number" maxlength="10" />
+    <input type="password" id="passInput" placeholder="Password" />
+    <button class="btn-primary" onclick="doLogin()">Sign In</button>
+    <div class="auth-error" id="authError"></div>
+  </div>
+</div>
+
+<div class="app" id="app">
+  <header>
+    <span class="brand">🛵 Dilli Bites</span>
+    <span class="greeting" id="greeting">Delivery Portal</span>
+    <button onclick="doLogout()">Logout</button>
+  </header>
+  <div class="main">
+    <div class="page-title">My Deliveries</div>
+    <div id="ordersList"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  let pollTimer = null;
+
+  async function doLogin() {
+    const phone = document.getElementById('phoneInput').value.trim();
+    const password = document.getElementById('passInput').value;
+    const errEl = document.getElementById('authError');
+    errEl.textContent = '';
+    try {
+      const res = await fetch('/api/delivery/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone, password }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        document.getElementById('authScreen').style.display = 'none';
+        document.getElementById('app').classList.add('visible');
+        document.getElementById('greeting').textContent = `Hi, ${data.name} 👋`;
+        loadOrders();
+        pollTimer = setInterval(loadOrders, 60000);
+      } else {
+        errEl.textContent = data.error || 'Login failed';
+      }
+    } catch { errEl.textContent = 'Connection error'; }
+  }
+
+  async function doLogout() {
+    await fetch('/api/delivery/logout', { method: 'POST' });
+    clearInterval(pollTimer);
+    location.reload();
+  }
+
+  document.getElementById('passInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') doLogin();
+  });
+
+  async function loadOrders() {
+    try {
+      const res = await fetch('/api/delivery/orders');
+      if (res.status === 401) { location.reload(); return; }
+      const orders = await res.json();
+      renderOrders(orders);
+    } catch { showToast('Failed to load orders', 'error'); }
+  }
+
+  function renderOrders(orders) {
+    const list = document.getElementById('ordersList');
+    const active = orders.filter(o => o.status !== 'delivered');
+    const done = orders.filter(o => o.status === 'delivered');
+
+    if (orders.length === 0) {
+      list.innerHTML = '<div class="empty-state">No orders assigned yet. Check back soon!</div>';
+      return;
+    }
+
+    const renderCard = order => `
+      <div class="order-card">
+        <div class="order-head">
+          <span class="order-id">#${order.id}</span>
+          <span class="badge badge-${order.status}">${order.status.replace(/_/g,' ')}</span>
+        </div>
+        <div class="order-items">${(order.items||[]).map(i => `<span>${esc(i.name)} ×${i.qty}</span>`).join('')}</div>
+        <div class="order-meta">
+          <strong>Customer:</strong> ${esc(order.customerName)}<br>
+          <strong>Phone:</strong> <a href="tel:${esc(order.customerPhone)}">${esc(order.customerPhone)}</a><br>
+          <strong>Address:</strong> ${esc(order.customerAddress)}
+        </div>
+        <div class="order-total">Rs ${order.totalAmount}</div>
+        ${renderActions(order)}
+      </div>`;
+
+    let html = active.map(renderCard).join('');
+    if (done.length > 0) {
+      html += `<div class="page-title" style="margin-top:24px;margin-bottom:12px;color:var(--muted);">Completed Today</div>`;
+      html += done.map(renderCard).join('');
+    }
+    list.innerHTML = html;
+  }
+
+  function renderActions(order) {
+    if (order.status === 'assigned') {
+      return `<div class="actions"><button class="btn-pickup" onclick="updateStatus(${order.id},'out_for_delivery')">Mark Picked Up</button></div>`;
+    }
+    if (order.status === 'out_for_delivery') {
+      return `<div class="actions"><button class="btn-deliver" onclick="updateStatus(${order.id},'delivered')">Mark Delivered ✓</button></div>`;
+    }
+    return '';
+  }
+
+  async function updateStatus(id, status) {
+    try {
+      const res = await fetch(`/api/delivery/orders/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        showToast(status === 'delivered' ? 'Order delivered! ✓' : 'Marked as picked up', 'success');
+        loadOrders();
+      } else showToast(data.error, 'error');
+    } catch { showToast('Request failed', 'error'); }
+  }
+
+  function esc(str) {
+    if (!str) return '';
+    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  function showToast(msg, type = 'success') {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = `toast ${type} show`;
+    setTimeout(() => t.classList.remove('show'), 3000);
+  }
+</script>
+</body>
+</html>
