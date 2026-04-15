@@ -4,7 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node server.js",
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "serve": "node server.js",
     "images:cards": "node scripts/convert-images.js images --exclude logo.png --width 720 --height 480 --fit cover --quality 76 --overwrite",
     "images:webp": "node scripts/convert-images.js",
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -22,6 +25,9 @@
   "homepage": "https://github.com/mdirfan40/dilli-bites#readme",
   "dependencies": {
     "express": "^5.2.1",
+    "next": "^16.2.3",
+    "react": "^19.2.5",
+    "react-dom": "^19.2.5",
     "sharp": "^0.34.5"
   },
   "devDependencies": {
