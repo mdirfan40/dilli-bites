@@ -7,8 +7,20 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum UserType {
+  ADMIN
+  DELIVERY_AGENT
+  RESTAURANT_OWNER
+}
+
+enum VerificationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
 model MenuItem {
-  id          Int      @id @default(autoincrement())
+  id          Int         @id @default(autoincrement())
   category    String
   name        String
   description String?
@@ -16,9 +28,9 @@ model MenuItem {
   basePrice   Int
   imageUrl    String?
   badge       String?
-  stock       Int      @default(-1)
-  isActive    Boolean  @default(true)
-  sortOrder   Int      @default(0)
+  stock       Int         @default(-1)
+  isActive    Boolean     @default(true)
+  sortOrder   Int         @default(0)
   orderItems  OrderItem[]
 
   @@map("menu_items")
@@ -62,4 +74,51 @@ model DeliveryPerson {
   orders       Order[]
 
   @@map("delivery_persons")
+}
+
+model User {
+  id        Int       @id @default(autoincrement())
+  name      String
+  email     String    @unique
+  password  String
+  userType  UserType
+  isActive  Boolean   @default(true)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  admin           Admin?
+  deliveryAgent   DeliveryAgent?
+  restaurantOwner RestaurantOwner?
+}
+
+model Admin {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model DeliveryAgent {
+  id                 Int                @id @default(autoincrement())
+  userId             Int                @unique
+  user               User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  phone              String
+  vehicleType        String?
+  isAvailable        Boolean            @default(true)
+  verificationStatus VerificationStatus @default(PENDING)
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+}
+
+model RestaurantOwner {
+  id                 Int                @id @default(autoincrement())
+  userId             Int                @unique
+  user               User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  restaurantName     String
+  phone              String?
+  address            String?
+  verificationStatus VerificationStatus @default(PENDING)
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
 }
