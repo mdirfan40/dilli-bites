@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dilli Bites — Restaurant Panel</title>
+<style>
+  :root {
+    --yellow: #FFD600;
+    --black: #111;
+    --red: #E63946;
+    --white: #fff;
+    --gray: #f5f5f5;
+    --muted: #666;
+    --border: #e0e0e0;
+    --green: #16a34a;
+    --blue: #2563eb;
+    --orange: #f97316;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', sans-serif; background: #f8f8f8; color: var(--black); }
+
+  /* Auth screen */
+  .auth-screen { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: var(--black); }
+  .auth-box { background: var(--white); border-radius: 16px; padding: 40px; width: 340px; text-align: center; }
+  .auth-box h1 { font-size: 1.6rem; margin-bottom: 4px; }
+  .auth-box p { color: var(--muted); font-size: 0.9rem; margin-bottom: 24px; }
+  .auth-box input { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 1rem; margin-bottom: 12px; }
+  .auth-box input:focus { outline: 2px solid var(--yellow); border-color: transparent; }
+  .btn-primary { width: 100%; padding: 12px; background: var(--yellow); color: var(--black); border: none; border-radius: 8px; font-size: 1rem; font-weight: 700; cursor: pointer; }
+  .btn-primary:hover { background: #e6c200; }
+  .auth-error { color: var(--red); font-size: 0.85rem; margin-top: 8px; }
+  .logo-tag { display: inline-block; background: var(--yellow); color: var(--black); font-weight: 900; font-size: 1.4rem; padding: 4px 14px; border-radius: 4px; margin-bottom: 16px; }
+
+  /* App layout */
+  .app { display: none; min-height: 100vh; flex-direction: column; }
+  .app.visible { display: flex; }
+  header { background: var(--black); color: var(--white); padding: 0 24px; display: flex; align-items: center; height: 56px; gap: 16px; }
+  header .brand { font-weight: 900; font-size: 1.1rem; color: var(--yellow); margin-right: auto; }
+  header button { background: transparent; border: 1px solid #444; color: #ccc; padding: 6px 14px; border-radius: 6px; cursor: pointer; font-size: 0.85rem; }
+  header button:hover { border-color: var(--yellow); color: var(--yellow); }
+
+  /* Tabs */
+  .tabs { background: var(--white); border-bottom: 2px solid var(--border); display: flex; padding: 0 24px; }
+  .tab { padding: 14px 20px; font-weight: 600; font-size: 0.9rem; cursor: pointer; border-bottom: 3px solid transparent; margin-bottom: -2px; color: var(--muted); }
+  .tab.active { color: var(--black); border-bottom-color: var(--yellow); }
+
+  /* Main content */
+  .tab-content { display: none; padding: 24px; max-width: 1100px; margin: 0 auto; width: 100%; }
+  .tab-content.active { display: block; }
+
+  /* Status filters */
+  .filter-bar { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
+  .filter-btn { padding: 6px 14px; border-radius: 20px; border: 1px solid var(--border); background: var(--white); cursor: pointer; font-size: 0.83rem; font-weight: 600; }
+  .filter-btn.active { background: var(--black); color: var(--white); border-color: var(--black); }
+
+  /* Order cards */
+  .orders-list { display: flex; flex-direction: column; gap: 16px; }
+  .order-card { background: var(--white); border-radius: 12px; border: 1px solid var(--border); padding: 20px; }
+  .order-card-head { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; flex-wrap: wrap; }
+  .order-id { font-weight: 900; font-size: 1rem; }
+  .order-customer { font-weight: 600; }
+  .order-time { color: var(--muted); font-size: 0.82rem; margin-left: auto; }
+  .badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; }
+  .badge-new { background: #fef9c3; color: #854d0e; }
+  .badge-accepted { background: #dbeafe; color: #1e40af; }
+  .badge-assigned { background: #ffedd5; color: #9a3412; }
+  .badge-out_for_delivery { background: #fed7aa; color: #7c2d12; }
+  .badge-delivered { background: #dcfce7; color: #166534; }
+  .badge-rejected { background: #fee2e2; color: #991b1b; }
+  .order-items { font-size: 0.88rem; color: #333; margin-bottom: 10px; }
+  .order-items span { display: inline-block; background: var(--gray); padding: 2px 8px; border-radius: 4px; margin: 2px; }
+  .order-meta { font-size: 0.84rem; color: var(--muted); margin-bottom: 14px; }
+  .order-meta strong { color: var(--black); }
+  .order-total { font-weight: 900; color: var(--red); font-size: 1.05rem; }
+  .order-actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .btn-accept  { padding: 8px 16px; background: var(--green); color: var(--white); border: none; border-radius: 6px; font-weight: 700; cursor: pointer; font-size: 0.85rem; }
+  .btn-reject  { padding: 8px 16px; background: var(--red); color: var(--white); border: none; border-radius: 6px; font-weight: 700; cursor: pointer; font-size: 0.85rem; }
+  .btn-assign  { padding: 8px 16px; background: var(--blue); color: var(--white); border: none; border-radius: 6px; font-weight: 700; cursor: pointer; font-size: 0.85rem; }
+  .btn-accept:hover { background: #15803d; }
+  .btn-reject:hover { background: #c0212c; }
+  .btn-assign:hover { background: #1d4ed8; }
+  .assign-select { padding: 8px 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 0.85rem; }
+  .empty-state { text-align: center; padding: 60px 20px; color: var(--muted); font-size: 1rem; }
+
+  /* Inventory */
+  .section-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+  .section-head h2 { font-size: 1.1rem; font-weight: 800; }
+  .inv-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; }
+  .inv-card { background: var(--white); border: 1px solid var(--border); border-radius: 10px; padding: 16px; }
+  .inv-card-name { font-weight: 700; font-size: 0.95rem; margin-bottom: 4px; }
+  .inv-card-cat { font-size: 0.78rem; color: var(--muted); text-transform: uppercase; margin-bottom: 10px; }
+  .inv-card-stock { font-size: 0.85rem; margin-bottom: 10px; }
+  .inv-card-stock .stock-val { font-weight: 900; color: var(--blue); }
+  .inv-card-stock .stock-val.out { color: var(--red); }
+  .inv-card-stock .stock-val.unlimited { color: var(--green); }
+  .inv-row { display: flex; gap: 6px; align-items: center; }
+  .inv-row input[type=number] { width: 70px; padding: 6px 8px; border: 1px solid var(--border); border-radius: 6px; font-size: 0.85rem; }
+  .btn-sm { padding: 6px 12px; border: none; border-radius: 6px; font-size: 0.82rem; font-weight: 700; cursor: pointer; }
+  .btn-update { background: var(--yellow); color: var(--black); }
+  .btn-toggle-active { background: var(--gray); color: var(--black); border: 1px solid var(--border); }
+  .btn-toggle-active.inactive { background: #fee2e2; color: var(--red); border-color: #fca5a5; }
+  .btn-unlimited { background: #f0fdf4; color: var(--green); border: 1px solid #bbf7d0; }
+
+  /* Menu management */
+  .menu-form { background: var(--white); border: 1px solid var(--border); border-radius: 12px; padding: 24px; margin-bottom: 24px; }
+  .menu-form h3 { font-size: 1rem; font-weight: 800; margin-bottom: 16px; }
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .form-group { display: flex; flex-direction: column; gap: 4px; }
+  .form-group label { font-size: 0.82rem; font-weight: 600; color: var(--muted); }
+  .form-group input, .form-group select { padding: 9px 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 0.9rem; }
+  .form-group input:focus, .form-group select:focus { outline: 2px solid var(--yellow); border-color: transparent; }
+  .form-full { grid-column: 1 / -1; }
+  .menu-items-list { display: flex; flex-direction: column; gap: 10px; }
+  .menu-item-row { background: var(--white); border: 1px solid var(--border); border-radius: 8px; padding: 14px 16px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .menu-item-info { flex: 1; min-width: 160px; }
+  .menu-item-info strong { display: block; font-size: 0.92rem; }
+  .menu-item-info span { font-size: 0.8rem; color: var(--muted); }
+  .menu-item-price { font-weight: 900; color: var(--red); font-size: 0.95rem; min-width: 80px; }
+  .menu-item-status { font-size: 0.78rem; font-weight: 700; padding: 3px 8px; border-radius: 12px; }
+  .menu-item-status.active { background: #dcfce7; color: #166534; }
+  .menu-item-status.inactive { background: #fee2e2; color: #991b1b; }
+  .btn-toggle-item { padding: 5px 10px; font-size: 0.78rem; font-weight: 700; border: none; border-radius: 6px; cursor: pointer; background: var(--gray); }
+
+  /* Delivery persons */
+  .dp-form { background: var(--white); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 20px; }
+  .dp-form h3 { font-size: 0.95rem; font-weight: 800; margin-bottom: 14px; }
+  .dp-form-row { display: flex; gap: 10px; flex-wrap: wrap; }
+  .dp-form-row input { flex: 1; min-width: 140px; padding: 9px 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 0.9rem; }
+  .dp-list { display: flex; flex-direction: column; gap: 8px; }
+  .dp-row { background: var(--white); border: 1px solid var(--border); border-radius: 8px; padding: 12px 16px; display: flex; align-items: center; gap: 10px; }
+  .dp-row .dp-name { font-weight: 700; flex: 1; }
+  .dp-row .dp-phone { color: var(--muted); font-size: 0.85rem; }
+
+  /* Toast */
+  .toast { position: fixed; bottom: 24px; right: 24px; background: var(--black); color: var(--white); padding: 12px 20px; border-radius: 8px; font-size: 0.88rem; font-weight: 600; z-index: 999; opacity: 0; transition: opacity 0.3s; pointer-events: none; }
+  .toast.show { opacity: 1; }
+  .toast.success { border-left: 4px solid var(--green); }
+  .toast.error { border-left: 4px solid var(--red); }
+</style>
+</head>
+<body>
+
+<!-- Auth Screen -->
+<div class="auth-screen" id="authScreen">
+  <div class="auth-box">
+    <div class="logo-tag">🍴 Dilli Bites</div>
+    <h1>Restaurant Panel</h1>
+    <p>Sign in to manage your restaurant</p>
+    <input type="password" id="passwordInput" placeholder="Enter admin password" />
+    <button class="btn-primary" onclick="doLogin()">Sign In</button>
+    <div class="auth-error" id="authError"></div>
+  </div>
+</div>
+
+<!-- App -->
+<div class="app" id="app">
+  <header>
+    <span class="brand">🍴 Dilli Bites</span>
+    <span id="headerStatus" style="font-size:0.8rem;color:#aaa;"></span>
+    <button onclick="doLogout()">Logout</button>
+  </header>
+
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab('orders', this)">Orders</div>
+    <div class="tab" onclick="switchTab('inventory', this)">Inventory</div>
+    <div class="tab" onclick="switchTab('menu', this)">Menu</div>
+    <div class="tab" onclick="switchTab('delivery-persons', this)">Delivery Persons</div>
+  </div>
+
+  <!-- ORDERS TAB -->
+  <div class="tab-content active" id="tab-orders">
+    <div class="filter-bar">
+      <button class="filter-btn active" onclick="filterOrders('all', this)">All</button>
+      <button class="filter-btn" onclick="filterOrders('new', this)">New</button>
+      <button class="filter-btn" onclick="filterOrders('accepted', this)">Accepted</button>
+      <button class="filter-btn" onclick="filterOrders('assigned', this)">Assigned</button>
+      <button class="filter-btn" onclick="filterOrders('out_for_delivery', this)">Out for Delivery</button>
+      <button class="filter-btn" onclick="filterOrders('delivered', this)">Delivered</button>
+      <button class="filter-btn" onclick="filterOrders('rejected', this)">Rejected</button>
+    </div>
+    <div class="orders-list" id="ordersList"></div>
+  </div>
+
+  <!-- INVENTORY TAB -->
+  <div class="tab-content" id="tab-inventory">
+    <div class="section-head">
+      <h2>Inventory Management</h2>
+      <span style="font-size:0.82rem;color:var(--muted);">Stock = -1 means unlimited</span>
+    </div>
+    <div class="inv-grid" id="invGrid"></div>
+  </div>
+
+  <!-- MENU TAB -->
+  <div class="tab-content" id="tab-menu">
+    <div class="menu-form">
+      <h3>Add New Menu Item</h3>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Category *</label>
+          <select id="newCat">
+            <option value="momos">Momos</option>
+            <option value="snacks">Snacks</option>
+            <option value="pizza">Pizza</option>
+            <option value="extras">Extras</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Badge</label>
+          <input type="text" id="newBadge" placeholder="e.g. Steam, Fried" />
+        </div>
+        <div class="form-group form-full">
+          <label>Item Name *</label>
+          <input type="text" id="newName" placeholder="e.g. Steam Veg Momos" />
+        </div>
+        <div class="form-group">
+          <label>Price Text *</label>
+          <input type="text" id="newPriceText" placeholder="e.g. Rs 30–50" />
+        </div>
+        <div class="form-group">
+          <label>Base Price (Rs) *</label>
+          <input type="number" id="newBasePrice" placeholder="30" min="0" />
+        </div>
+        <div class="form-group">
+          <label>Initial Stock (-1 = unlimited)</label>
+          <input type="number" id="newStock" value="-1" />
+        </div>
+        <div class="form-group">
+          <label>Image URL</label>
+          <input type="text" id="newImageUrl" placeholder="images/filename.webp" />
+        </div>
+      </div>
+      <div style="margin-top:14px">
+        <button class="btn-primary" style="width:auto;padding:10px 24px;" onclick="addMenuItem()">Add Item</button>
+      </div>
+    </div>
+    <h2 style="font-size:1rem;font-weight:800;margin-bottom:12px;">All Menu Items</h2>
+    <div class="menu-items-list" id="menuItemsList"></div>
+  </div>
+
+  <!-- DELIVERY PERSONS TAB -->
+  <div class="tab-content" id="tab-delivery-persons">
+    <div class="dp-form">
+      <h3>Add Delivery Person</h3>
+      <div class="dp-form-row">
+        <input type="text" id="dpName" placeholder="Full name" />
+        <input type="tel" id="dpPhone" placeholder="10-digit phone" maxlength="10" />
+        <input type="password" id="dpPassword" placeholder="Password" />
+        <button class="btn-primary" style="width:auto;white-space:nowrap;padding:9px 18px;" onclick="addDeliveryPerson()">Add</button>
+      </div>
+    </div>
+    <h2 style="font-size:1rem;font-weight:800;margin-bottom:12px;">Delivery Team</h2>
+    <div class="dp-list" id="dpList"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  let allOrders = [];
+  let deliveryPersons = [];
+  let currentFilter = 'all';
+  let pollTimer = null;
+
+  // ── Auth ────────────────────────────────────────────────────────────────────
+
+  async function doLogin() {
+    const password = document.getElementById('passwordInput').value;
+    const errEl = document.getElementById('authError');
+    errEl.textContent = '';
+    try {
+      const res = await fetch('/api/admin/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password }),
+      });
+      if (res.ok) {
+        document.getElementById('authScreen').style.display = 'none';
+        document.getElementById('app').classList.add('visible');
+        loadAll();
+        pollTimer = setInterval(loadOrders, 30000);
+      } else {
+        errEl.textContent = 'Incorrect password. Try again.';
+      }
+    } catch { errEl.textContent = 'Connection error. Is the server running?'; }
+  }
+
+  async function doLogout() {
+    await fetch('/api/admin/logout', { method: 'POST' });
+    clearInterval(pollTimer);
+    location.reload();
+  }
+
+  document.getElementById('passwordInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') doLogin();
+  });
+
+  // ── Load data ───────────────────────────────────────────────────────────────
+
+  async function loadAll() {
+    await Promise.all([loadOrders(), loadDeliveryPersons()]);
+  }
+
+  async function loadOrders() {
+    try {
+      const res = await fetch('/api/admin/orders');
+      if (res.status === 401) { location.reload(); return; }
+      allOrders = await res.json();
+      renderOrders();
+      document.getElementById('headerStatus').textContent =
+        `${allOrders.filter(o => o.status === 'new').length} new order(s)`;
+    } catch { showToast('Failed to load orders', 'error'); }
+  }
+
+  async function loadDeliveryPersons() {
+    try {
+      const res = await fetch('/api/admin/delivery-persons');
+      if (res.ok) deliveryPersons = await res.json();
+      renderDpList();
+    } catch {}
+  }
+
+  async function loadInventory() {
+    try {
+      const res = await fetch('/api/admin/menu');
+      const items = await res.json();
+      renderInventory(items);
+      renderMenuItems(items);
+    } catch { showToast('Failed to load menu', 'error'); }
+  }
+
+  // ── Tabs ────────────────────────────────────────────────────────────────────
+
+  function switchTab(name, el) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+    document.getElementById('tab-' + name).classList.add('active');
+    if (name === 'inventory' || name === 'menu') loadInventory();
+    if (name === 'delivery-persons') loadDeliveryPersons();
+  }
+
+  // ── Orders ──────────────────────────────────────────────────────────────────
+
+  function filterOrders(status, btn) {
+    currentFilter = status;
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderOrders();
+  }
+
+  function renderOrders() {
+    const list = document.getElementById('ordersList');
+    const filtered = currentFilter === 'all' ? allOrders : allOrders.filter(o => o.status === currentFilter);
+    if (filtered.length === 0) {
+      list.innerHTML = `<div class="empty-state">No orders${currentFilter !== 'all' ? ' with status "' + currentFilter + '"' : ''}</div>`;
+      return;
+    }
+    list.innerHTML = filtered.map(order => `
+      <div class="order-card" id="order-${order.id}">
+        <div class="order-card-head">
+          <span class="order-id">#${order.id}</span>
+          <span class="order-customer">${esc(order.customerName)}</span>
+          <span class="badge badge-${order.status}">${order.status.replace(/_/g,' ')}</span>
+          <span class="order-time">${fmtTime(order.createdAt)}</span>
+        </div>
+        <div class="order-items">${(order.items||[]).map(i => `<span>${esc(i.name)} ×${i.qty}</span>`).join('')}</div>
+        <div class="order-meta">
+          <strong>Phone:</strong> ${esc(order.customerPhone)} &nbsp;|&nbsp;
+          <strong>Address:</strong> ${esc(order.customerAddress)}
+          ${order.delivery_person_name ? ` &nbsp;|&nbsp; <strong>Delivery:</strong> ${esc(order.delivery_person_name)}` : ''}
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
+          <span class="order-total">Rs ${order.totalAmount}</span>
+          <div class="order-actions">${renderActions(order)}</div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function renderActions(order) {
+    if (order.status === 'new') {
+      return `<button class="btn-accept" onclick="updateOrder(${order.id},'accepted')">Accept</button>
+              <button class="btn-reject" onclick="updateOrder(${order.id},'rejected')">Reject</button>`;
+    }
+    if (order.status === 'accepted') {
+      const opts = deliveryPersons.map(p => `<option value="${p.id}">${esc(p.name)}</option>`).join('');
+      return `<select class="assign-select" id="dp-select-${order.id}">
+                <option value="">Select delivery person</option>${opts}
+              </select>
+              <button class="btn-assign" onclick="assignOrder(${order.id})">Assign</button>`;
+    }
+    return '';
+  }
+
+  async function updateOrder(id, status) {
+    try {
+      const res = await fetch(`/api/admin/orders/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status }),
+      });
+      const data = await res.json();
+      if (!res.ok) { showToast(data.error, 'error'); return; }
+      showToast(`Order #${id} ${status}`, 'success');
+      await loadOrders();
+    } catch { showToast('Request failed', 'error'); }
+  }
+
+  async function assignOrder(id) {
+    const sel = document.getElementById(`dp-select-${id}`);
+    const delivery_person_id = parseInt(sel.value, 10);
+    if (!delivery_person_id) { showToast('Please select a delivery person', 'error'); return; }
+    try {
+      const res = await fetch(`/api/admin/orders/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: 'assigned', delivery_person_id }),
+      });
+      const data = await res.json();
+      if (!res.ok) { showToast(data.error, 'error'); return; }
+      showToast(`Order #${id} assigned`, 'success');
+      await loadOrders();
+    } catch { showToast('Request failed', 'error'); }
+  }
+
+  // ── Inventory ────────────────────────────────────────────────────────────────
+
+  function renderInventory(items) {
+    const grid = document.getElementById('invGrid');
+    grid.innerHTML = items.map(item => {
+      const stockLabel = item.stock === -1 ? '<span class="stock-val unlimited">Unlimited</span>'
+        : item.stock === 0 ? '<span class="stock-val out">Out of stock</span>'
+        : `<span class="stock-val">${item.stock} left</span>`;
+      return `
+        <div class="inv-card">
+          <div class="inv-card-name">${esc(item.name)}</div>
+          <div class="inv-card-cat">${esc(item.category)} · ${esc(item.badge||'')}</div>
+          <div class="inv-card-stock">Stock: ${stockLabel}</div>
+          <div class="inv-row" style="margin-bottom:6px;">
+            <input type="number" id="stock-${item.id}" value="${item.stock}" min="-1" placeholder="-1" />
+            <button class="btn-sm btn-update" onclick="updateStock(${item.id})">Update</button>
+            <button class="btn-sm btn-unlimited" onclick="setUnlimited(${item.id})">∞</button>
+          </div>
+          <button class="btn-sm btn-toggle-active ${item.isActive ? '' : 'inactive'}" id="toggle-${item.id}"
+            onclick="toggleActive(${item.id}, ${item.isActive})">
+            ${item.isActive ? 'Active — click to hide' : 'Hidden — click to show'}
+          </button>
+        </div>`;
+    }).join('');
+  }
+
+  async function updateStock(id) {
+    const val = parseInt(document.getElementById(`stock-${id}`).value, 10);
+    if (isNaN(val)) { showToast('Enter a valid number', 'error'); return; }
+    const res = await fetch(`/api/admin/menu/${id}`, {
+      method: 'PATCH', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ stock: val }),
+    });
+    if (res.ok) { showToast('Stock updated', 'success'); loadInventory(); }
+    else showToast('Failed to update stock', 'error');
+  }
+
+  async function setUnlimited(id) {
+    const res = await fetch(`/api/admin/menu/${id}`, {
+      method: 'PATCH', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ stock: -1 }),
+    });
+    if (res.ok) { showToast('Set to unlimited', 'success'); loadInventory(); }
+  }
+
+  async function toggleActive(id, currentlyActive) {
+    const res = await fetch(`/api/admin/menu/${id}`, {
+      method: 'PATCH', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ is_active: currentlyActive ? 0 : 1 }),
+    });
+    if (res.ok) { showToast('Item updated', 'success'); loadInventory(); }
+  }
+
+  // ── Menu management ──────────────────────────────────────────────────────────
+
+  function renderMenuItems(items) {
+    const list = document.getElementById('menuItemsList');
+    list.innerHTML = items.map(item => `
+      <div class="menu-item-row">
+        <div class="menu-item-info">
+          <strong>${esc(item.name)}</strong>
+          <span>${esc(item.category)} · ${esc(item.badge||'')}</span>
+        </div>
+        <div class="menu-item-price">${esc(item.priceText)}</div>
+        <span class="menu-item-status ${item.isActive ? 'active' : 'inactive'}">${item.isActive ? 'Active' : 'Hidden'}</span>
+        <button class="btn-toggle-item" onclick="toggleActive(${item.id}, ${item.isActive})">
+          ${item.isActive ? 'Hide' : 'Show'}
+        </button>
+      </div>
+    `).join('');
+  }
+
+  async function addMenuItem() {
+    const name = document.getElementById('newName').value.trim();
+    const category = document.getElementById('newCat').value;
+    const price_text = document.getElementById('newPriceText').value.trim();
+    const base_price = parseInt(document.getElementById('newBasePrice').value, 10);
+    const stock = parseInt(document.getElementById('newStock').value, 10);
+    const badge = document.getElementById('newBadge').value.trim();
+    const image_url = document.getElementById('newImageUrl').value.trim();
+
+    if (!name || !price_text || isNaN(base_price)) {
+      showToast('Name, price text, and base price are required', 'error'); return;
+    }
+    const res = await fetch('/api/admin/menu', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ category, name, price_text, base_price, badge: badge||null, image_url: image_url||null, stock: isNaN(stock) ? -1 : stock }),
+    });
+    if (res.ok) {
+      showToast('Menu item added!', 'success');
+      ['newName','newPriceText','newBasePrice','newBadge','newImageUrl'].forEach(id => document.getElementById(id).value = '');
+      document.getElementById('newStock').value = '-1';
+      loadInventory();
+    } else {
+      const d = await res.json();
+      showToast(d.error || 'Failed to add item', 'error');
+    }
+  }
+
+  // ── Delivery persons ─────────────────────────────────────────────────────────
+
+  function renderDpList() {
+    const list = document.getElementById('dpList');
+    if (!deliveryPersons.length) { list.innerHTML = '<div class="empty-state">No delivery persons added yet</div>'; return; }
+    list.innerHTML = deliveryPersons.map(p => `
+      <div class="dp-row">
+        <span class="dp-name">${esc(p.name)}</span>
+        <span class="dp-phone">📞 ${esc(p.phone)}</span>
+      </div>
+    `).join('');
+  }
+
+  async function addDeliveryPerson() {
+    const name = document.getElementById('dpName').value.trim();
+    const phone = document.getElementById('dpPhone').value.trim();
+    const password = document.getElementById('dpPassword').value;
+    if (!name || !phone || !password) { showToast('All fields required', 'error'); return; }
+    const res = await fetch('/api/admin/delivery-persons', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, phone, password }),
+    });
+    const data = await res.json();
+    if (res.ok) {
+      showToast(`${name} added as delivery person`, 'success');
+      ['dpName','dpPhone','dpPassword'].forEach(id => document.getElementById(id).value = '');
+      await loadDeliveryPersons();
+    } else showToast(data.error || 'Failed to add', 'error');
+  }
+
+  // ── Helpers ──────────────────────────────────────────────────────────────────
+
+  function esc(str) {
+    if (!str) return '';
+    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  function fmtTime(ts) {
+    if (!ts) return '';
+    const d = new Date(ts);
+    return d.toLocaleString('en-IN', { day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' });
+  }
+
+  function showToast(msg, type = 'success') {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = `toast ${type} show`;
+    setTimeout(() => t.classList.remove('show'), 3000);
+  }
+</script>
+</body>
+</html>
