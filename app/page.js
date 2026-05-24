@@ -253,6 +253,9 @@ export default function Home() {
         <div className="hero-cta">
           <a href="#momos" className="btn-y">Explore Menu</a>
           <a href="#contact" className="btn-o">Find Us</a>
+          <a href="/login" className="btn-o">Sign In</a>
+          <a href="/register/restaurant" className="btn-o">Join as Owner</a>
+          <a href="/register/agent" className="btn-o">Join as Agent</a>
           <a href="/v2" className="btn-o">Open V2</a>
         </div>
       </section>

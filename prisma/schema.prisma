@@ -6,6 +6,18 @@ datasource db {
   provider = "sqlite"
 }
 
+enum UserType {
+  ADMIN
+  DELIVERY_AGENT
+  RESTAURANT_OWNER
+}
+
+enum VerificationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
 model MenuItem {
   id          Int      @id @default(autoincrement())
   name        String
@@ -13,4 +25,51 @@ model MenuItem {
   price       Float
   description String?
   createdAt   DateTime @default(now())
+}
+
+model User {
+  id        Int       @id @default(autoincrement())
+  name      String
+  email     String    @unique
+  password  String
+  userType  UserType
+  isActive  Boolean   @default(true)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  admin           Admin?
+  deliveryAgent   DeliveryAgent?
+  restaurantOwner RestaurantOwner?
+}
+
+model Admin {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model DeliveryAgent {
+  id                 Int                @id @default(autoincrement())
+  userId             Int                @unique
+  user               User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  phone              String
+  vehicleType        String?
+  isAvailable        Boolean            @default(true)
+  verificationStatus VerificationStatus @default(PENDING)
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+}
+
+model RestaurantOwner {
+  id                 Int                @id @default(autoincrement())
+  userId             Int                @unique
+  user               User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  restaurantName     String
+  phone              String?
+  address            String?
+  verificationStatus VerificationStatus @default(PENDING)
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
 }
